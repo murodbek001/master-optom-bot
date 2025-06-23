@@ -2,56 +2,81 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Заказ стройматериалов</title>
+  <title>СтройМаркет</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     body {
-      font-family: sans-serif;
-      margin: 20px;
-      background: #f0f0f0;
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f5f5f5;
     }
-    h1 {
-      color: #333;
+    header {
+      background: #4caf50;
+      color: #fff;
+      padding: 15px;
+      text-align: center;
+      font-size: 24px;
+      border-radius: 5px;
     }
     .item {
       background: #fff;
+      margin: 10px 0;
       padding: 10px;
-      margin-bottom: 10px;
       border-radius: 5px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
+    .item img {
+      width: 50px;
+      height: 50px;
+      object-fit: cover;
+      border-radius: 5px;
+    }
     .item input {
-      width: 60px;
+      width: 50px;
+      text-align: center;
     }
     button {
-      padding: 12px 20px;
-      font-size: 16px;
+      width: 100%;
+      padding: 15px;
       background: #4caf50;
-      color: white;
+      color: #fff;
       border: none;
       border-radius: 5px;
+      font-size: 18px;
       cursor: pointer;
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
-  <h1>🛒 Заказ стройматериалов</h1>
+  <header>🛒 СтройМаркет</header>
 
   <div class="item">
-    <span>Труба ПВХ 100мм (50 000)</span>
+    <div>
+      <strong>Труба ПВХ</strong><br>
+      50 000 сум
+    </div>
     <input type="number" min="0" value="0" data-price="50000">
   </div>
 
   <div class="item">
-    <span>Гипсокартон 12мм (70 000)</span>
+    <div>
+      <strong>Гипсокартон</strong><br>
+      70 000 сум
+    </div>
     <input type="number" min="0" value="0" data-price="70000">
   </div>
 
   <div class="item">
-    <span>Плитка керамическая (85 000)</span>
+    <div>
+      <strong>Плитка</strong><br>
+      85 000 сум
+    </div>
     <input type="number" min="0" value="0" data-price="85000">
   </div>
 
@@ -62,30 +87,23 @@
     tg.expand();
 
     function placeOrder() {
-      const inputs = document.querySelectorAll('input');
       let order = [];
       let total = 0;
-
-      inputs.forEach(input => {
-        const qty = parseInt(input.value);
-        const price = parseInt(input.dataset.price);
+      document.querySelectorAll('input').forEach(input => {
+        let qty = parseInt(input.value);
+        let price = parseInt(input.dataset.price);
         if (qty > 0) {
-          order.push({ item: input.previousElementSibling.innerText, quantity: qty, sum: qty * price });
+          order.push({ item: input.parentElement.innerText.trim(), qty, sum: qty * price });
           total += qty * price;
         }
       });
 
       if (order.length === 0) {
-        alert("Пожалуйста, выберите хотя бы один товар.");
+        alert("Выберите хотя бы один товар!");
         return;
       }
 
-      const data = {
-        order: order,
-        total: total
-      };
-
-      tg.sendData(JSON.stringify(data));
+      tg.sendData(JSON.stringify({order, total}));
       tg.close();
     }
   </script>
