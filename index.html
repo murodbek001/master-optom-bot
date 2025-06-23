@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Заказ стройматериалов</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 20px;
+      background: #f0f0f0;
+    }
+    h1 {
+      color: #333;
+    }
+    .item {
+      background: #fff;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .item input {
+      width: 60px;
+    }
+    button {
+      padding: 12px 20px;
+      font-size: 16px;
+      background: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>🛒 Заказ стройматериалов</h1>
+
+  <div class="item">
+    <span>Труба ПВХ 100мм (50 000)</span>
+    <input type="number" min="0" value="0" data-price="50000">
+  </div>
+
+  <div class="item">
+    <span>Гипсокартон 12мм (70 000)</span>
+    <input type="number" min="0" value="0" data-price="70000">
+  </div>
+
+  <div class="item">
+    <span>Плитка керамическая (85 000)</span>
+    <input type="number" min="0" value="0" data-price="85000">
+  </div>
+
+  <button onclick="placeOrder()">Оформить заказ</button>
+
+  <script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+
+    function placeOrder() {
+      const inputs = document.querySelectorAll('input');
+      let order = [];
+      let total = 0;
+
+      inputs.forEach(input => {
+        const qty = parseInt(input.value);
+        const price = parseInt(input.dataset.price);
+        if (qty > 0) {
+          order.push({ item: input.previousElementSibling.innerText, quantity: qty, sum: qty * price });
+          total += qty * price;
+        }
+      });
+
+      if (order.length === 0) {
+        alert("Пожалуйста, выберите хотя бы один товар.");
+        return;
+      }
+
+      const data = {
+        order: order,
+        total: total
+      };
+
+      tg.sendData(JSON.stringify(data));
+      tg.close();
+    }
+  </script>
+</body>
+</html>
