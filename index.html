@@ -1,111 +1,121 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <title>СтройМаркет</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Master Qurilish Mollari</title>
   <style>
     body {
-      font-family: 'Arial', sans-serif;
+      font-family: sans-serif;
+      background: #fff;
       margin: 0;
-      padding: 20px;
-      background: #f5f5f5;
+      padding: 0;
     }
     header {
-      background: #4caf50;
-      color: #fff;
-      padding: 15px;
-      text-align: center;
-      font-size: 24px;
-      border-radius: 5px;
-    }
-    .item {
-      background: #fff;
-      margin: 10px 0;
-      padding: 10px;
-      border-radius: 5px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      background: #000;
+      padding: 10px;
     }
-    .item img {
-      width: 50px;
-      height: 50px;
-      object-fit: cover;
-      border-radius: 5px;
+    header img {
+      height: 40px;
     }
-    .item input {
-      width: 50px;
+    h1 {
+      color: #000;
+      font-size: 20px;
+    }
+    .catalog {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+      padding: 10px;
+    }
+    .card {
+      border: 1px solid #ddd;
+      padding: 10px;
       text-align: center;
+    }
+    .card img {
+      width: 100%;
+      height: 100px;
+      object-fit: cover;
+    }
+    .price {
+      font-weight: bold;
+      margin: 5px 0;
     }
     button {
-      width: 100%;
-      padding: 15px;
-      background: #4caf50;
+      background: #e60000;
       color: #fff;
       border: none;
-      border-radius: 5px;
-      font-size: 18px;
+      padding: 5px 10px;
       cursor: pointer;
-      margin-top: 20px;
+    }
+    .cart {
+      padding: 10px;
+      border-top: 2px solid #000;
     }
   </style>
 </head>
 <body>
-  <header>🛒 СтройМаркет</header>
 
-  <div class="item">
-    <div>
-      <strong>Труба ПВХ</strong><br>
-      50 000 сум
-    </div>
-    <input type="number" min="0" value="0" data-price="50000">
+<header>
+  <img src="logo.png" alt="Master Qurilish Mollari">
+</header>
+
+<div class="catalog">
+  <div class="card">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/PVC_pipe.jpg" alt="Труба ПВХ">
+    <div>Труба ПВХ</div>
+    <div class="price">50 000 сум</div>
+    <button onclick="addToCart('Труба ПВХ', 50000)">Добавить</button>
   </div>
 
-  <div class="item">
-    <div>
-      <strong>Гипсокартон</strong><br>
-      70 000 сум
-    </div>
-    <input type="number" min="0" value="0" data-price="70000">
+  <div class="card">
+    <img src="https://www.knauf.com/globalassets/produkte/gypsumboard/standard-gypsumboard.jpg" alt="Гипсокартон">
+    <div>Гипсокартон</div>
+    <div class="price">70 000 сум</div>
+    <button onclick="addToCart('Гипсокартон', 70000)">Добавить</button>
   </div>
 
-  <div class="item">
-    <div>
-      <strong>Плитка</strong><br>
-      85 000 сум
-    </div>
-    <input type="number" min="0" value="0" data-price="85000">
+  <div class="card">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/4/47/Ceramic_tile_sample.jpg" alt="Плитка">
+    <div>Плитка керамическая</div>
+    <div class="price">85 000 сум</div>
+    <button onclick="addToCart('Плитка', 85000)">Добавить</button>
   </div>
+</div>
 
-  <button onclick="placeOrder()">Оформить заказ</button>
+<div class="cart">
+  <div id="cartItems">Корзина пуста</div>
+  <div id="total"></div>
+  <button onclick="checkout()">Оформить заказ</button>
+</div>
 
-  <script>
-    const tg = window.Telegram.WebApp;
-    tg.expand();
-
-    function placeOrder() {
-      let order = [];
-      let total = 0;
-      document.querySelectorAll('input').forEach(input => {
-        let qty = parseInt(input.value);
-        let price = parseInt(input.dataset.price);
-        if (qty > 0) {
-          order.push({ item: input.parentElement.innerText.trim(), qty, sum: qty * price });
-          total += qty * price;
-        }
-      });
-
-      if (order.length === 0) {
-        alert("Выберите хотя бы один товар!");
-        return;
-      }
-
-      tg.sendData(JSON.stringify({order, total}));
-      tg.close();
+<script>
+  let cart = [];
+  function addToCart(name, price) {
+    cart.push({name, price});
+    updateCart();
+  }
+  function updateCart() {
+    let cartDiv = document.getElementById('cartItems');
+    let totalDiv = document.getElementById('total');
+    if(cart.length === 0){
+      cartDiv.innerHTML = 'Корзина пуста';
+      totalDiv.innerHTML = '';
+      return;
     }
-  </script>
+    cartDiv.innerHTML = cart.map(item => item.name + ' — ' + item.price + ' сум').join('<br>');
+    let total = cart.reduce((sum, item) => sum + item.price, 0);
+    totalDiv.innerHTML = '<strong>Итого: ' + total + ' сум</strong>';
+  }
+  function checkout() {
+    alert('Заказ оформлен! Мы свяжемся с вами.');
+    cart = [];
+    updateCart();
+  }
+</script>
+
 </body>
 </html>
